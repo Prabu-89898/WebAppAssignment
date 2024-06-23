@@ -1,0 +1,81 @@
+.chart-container, .table-container {
+    width: 80%;
+    margin: 20px auto;
+    display: none;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: linear-gradient(92deg, #f3f4f6, #4eb7c5);
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #2d2121;
+    padding: 10px;
+    text-align: center;
+}
+th {
+    background: linear-gradient(92deg, #ea2222, #74625c);
+    color: white;
+}
+.highlight {
+    background-color: yellow;
+}
+.toggle-buttons {
+    width: 80%;
+    margin: 20px auto;
+    text-align: center;
+}
+.toggle-buttons button {
+    margin: 5px;
+    background-color: aliceblue;
+}
+h1{
+    text-align: center;
+}
+
+.table-container {
+    background-color: #fff;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.table-container button {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 10px auto;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.table-container button:hover {
+    background-color: #0056b3;
+}
+
+.chart-container button{
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 10px auto;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.chart-container button:hover {
+    background-color: #0056b3;
+}

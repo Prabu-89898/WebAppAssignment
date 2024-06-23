@@ -3,33 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="calendar.css">
+    <!-- <script src="calendar.js"></script> -->
     <title>Calendar</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        td {
-            height: 100px;
-            vertical-align: top;
-        }
-        .navigation {
-            margin: 20px 0;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
     <h1>Calendar</h1>
 
+    
     <?php
     function build_calendar($month, $year) {
         include 'db.php';
@@ -55,7 +36,6 @@
         }
 
         $currentDay = 1;
-
         $month = str_pad($month, 2, "0", STR_PAD_LEFT);
 
         while ($currentDay <= $numberDays) {
@@ -103,14 +83,14 @@
     echo build_calendar($month, $year);
     ?>
 
-    <div class="navigation">
-        <a href="?month=<?php echo $month == 1 ? 12 : $month - 1; ?>&year=<?php echo $month == 1 ? $year - 1 : $year; ?>">&lt; Previous</a>
-        &nbsp;|&nbsp;
-        <a href="?month=<?php echo $month == 12 ? 1 : $month + 1; ?>&year=<?php echo $month == 12 ? $year + 1 : $year; ?>">Next &gt;</a>
+    <div class="navigation-buttons">
+        <a href="?month=<?php echo $month == 1 ? 12 : $month - 1; ?>&year=<?php echo $month == 1 ? $year - 1 : $year; ?>" class="nav-button">&lt; Previous</a>
+        <a href="?month=<?php echo $month == 12 ? 1 : $month + 1; ?>&year=<?php echo $month == 12 ? $year + 1 : $year; ?>" class="nav-button">Next &gt;</a>
     </div>
 
+
     <h2>Suggest an Event</h2>
-    <form action="suggest_event.php" method="POST">
+    <form class="suggest-event-form" action="suggest_event.php" method="POST">
         <label for="event_date">Date:</label>
         <input type="date" id="event_date" name="event_date" required>
         <br>

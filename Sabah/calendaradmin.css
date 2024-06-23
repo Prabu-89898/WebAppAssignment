@@ -1,0 +1,175 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(92deg, #479ee0, #4eb7c5);
+    margin: 0;
+    padding: 0;
+}
+
+
+
+h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff5f5;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: linear-gradient(92deg, #f3f4f6, #4eb7c5);
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #2d2121;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: linear-gradient(92deg, #ea2222, #74625c);
+    color: white;
+}
+
+td {
+    height: 100px;
+    vertical-align: top;
+}
+
+.navigation-buttons {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.nav-button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    color: whitesmoke;
+    background-color: #0056b3;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: peachpuff;
+}
+
+/* Styles for the event forms */
+.event-form {
+    background: #f7f7f7;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 300px;
+    margin: 20px auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Centering the form */
+}
+
+.event-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.event-form input[type="date"],
+.event-form input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.event-form button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.event-form button:hover {
+    background-color: #5af57b;
+}
+
+
+.suggested-events-table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: linear-gradient(135deg, #f3f4f6, #e0f7fa);
+}
+
+.suggested-events-table th, .suggested-events-table td {
+    border: 1px solid #2d2121;
+    padding: 10px;
+    text-align: center;
+}
+
+.suggested-events-table th {
+    background: linear-gradient(135deg, #5988e7, #7479ff);
+    color: white;
+}
+
+.suggested-events-table td {
+    background: #fff;
+}
+
+.action-button {
+    background-color: #c0110b;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Fix for action links */
+    display: inline-block; /* Ensure inline display */
+    margin-right: 5px; /* Add some spacing between links */
+}
+
+.action-button:hover {
+    background-color: #f09a9a;
+}
+.add-button {
+    background-color: #38cc93;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Fix for action links */
+    display: inline-block; /* Ensure inline display */
+    margin-right: 5px; /* Add some spacing between links */
+}
+
+.add-button:hover {
+    background-color: #1ce40d;
+}
+.delete-button {
+    background-color: #e33838;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Fix for action links */
+    display: inline-block; /* Ensure inline display */
+    margin-right: 5px; /* Add some spacing between links */
+}
+
+.delete-button:hover {
+    background-color: #eb2525;
+}
