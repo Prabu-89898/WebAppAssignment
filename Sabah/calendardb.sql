@@ -3,7 +3,7 @@ CREATE DATABASE calendardb;
 USE calendardb;
 
 -- Table for events
-CREATE TABLE events (
+CREATE TABLE calendarevents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     event_date DATE NOT NULL,
     event_description VARCHAR(255) NOT NULL

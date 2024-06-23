@@ -3,259 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics</title>
-    <link rel="stylesheet" href="analytics.css">
-    <script src="analytics.js"></script>
+    <title>Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.0/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="analytics.css">
+    <style>
+        .toggle-buttons button {
+            margin: 5px;
+        }
+        .chart-container, .table-container {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Admin Analytics</h1>
+<?php
+        // Fetch FAQ Data
+        include 'db2.php';
+        $faqQuestions = [];
+        $faqAnswers = [];
+        $faqSql = "SELECT question, answer FROM faqs";
+        $faqResult = $conn->query($faqSql);
+        if ($faqResult->num_rows > 0) {
+            while($row = $faqResult->fetch_assoc()) {
+                $faqQuestions[] = $row['question'];
+                $faqAnswers[] = $row['answer'];
+            }
+        }
 
-    <?php
-    include 'db2.php';
+        // Fetch New Users Data
+        $newUserNames = [];
+        $newUserEmails = [];
+        $newUsersSql = "SELECT Name, email FROM new_users";
+        $newUsersResult = $conn->query($newUsersSql);
+        if ($newUsersResult->num_rows > 0) {
+            while($row = $newUsersResult->fetch_assoc()) {
+                $newUserNames[] = $row['Name'];
+                $newUserEmails[] = $row['email'];
+            }
+        }
 
-    // Fetch event data
-    $eventQuery = "SELECT event_date, COUNT(*) as event_count FROM events GROUP BY event_date";
-    $eventResult = mysqli_query($conn, $eventQuery);
-    $eventDates = [];
-    $eventCounts = [];
-    while ($row = mysqli_fetch_assoc($eventResult)) {
-        $eventDates[] = $row['event_date'];
-        $eventCounts[] = $row['event_count'];
-    }
+        // Fetch New Registers Data
+        $newRegisters = [];
+        $newRegistersSql = "SELECT * FROM new_registers";
+        $newRegistersResult = $conn->query($newRegistersSql);
+        if ($newRegistersResult->num_rows > 0) {
+            while($row = $newRegistersResult->fetch_assoc()) {
+                // Check if 'ID' and 'DateRegistered' keys exist in $row
+                $id = isset($row['ID']) ? $row['ID'] : 'N/A';
+                $name = isset($row['Name']) ? $row['Name'] : 'N/A';
+                $email = isset($row['Email']) ? $row['Email'] : 'N/A';
+                $dateRegistered = isset($row['DateRegistered']) ? $row['DateRegistered'] : 'N/A';
+                
+                $newRegisters[] = [
+                    'ID' => $id,
+                    'Name' => $name,
+                    'Email' => $email,
+                    'DateRegistered' => $dateRegistered
+                ];
+            }
+        }
 
-    // Fetch user data
-    $userQuery = "SELECT user_type, COUNT(*) as user_count FROM users GROUP BY user_type";
-    $userResult = mysqli_query($conn, $userQuery);
-    $userTypes = [];
-    $userCounts = [];
-    while ($row = mysqli_fetch_assoc($userResult)) {
-        $userTypes[] = $row['user_type'];
-        $userCounts[] = $row['user_count'];
-    }
+        // Fetch Suggestions Data
+        $suggestions = [];
+        $suggestionsSql = "SELECT * FROM suggestions";
+        $suggestionsResult = $conn->query($suggestionsSql);
+        if ($suggestionsResult->num_rows > 0) {
+            while($row = $suggestionsResult->fetch_assoc()) {
+                // Example of handling optional keys in suggestions table
+                $id = isset($row['ID']) ? $row['ID'] : 'N/A';
+                $suggestion = isset($row['Suggestion']) ? $row['Suggestion'] : 'N/A';
+                $userID = isset($row['UserID']) ? $row['UserID'] : 'N/A';
+                
+                $suggestions[] = [
+                    'ID' => $id,
+                    'Suggestion' => $suggestion,
+                    'UserID' => $userID
+                ];
+            }
+        }
 
-    // Fetch events per month data
-    $eventsPerMonthQuery = "SELECT DATE_FORMAT(event_date, '%Y-%m') as month, COUNT(*) as event_count FROM events GROUP BY month";
-    $eventsPerMonthResult = mysqli_query($conn, $eventsPerMonthQuery);
-    $eventMonths = [];
-    $eventMonthCounts = [];
-    while ($row = mysqli_fetch_assoc($eventsPerMonthResult)) {
-        $eventMonths[] = $row['month'];
-        $eventMonthCounts[] = $row['event_count'];
-    }
+        // Fetch Events Data
+        $eventDates = [];
+        $eventCounts = [];
+        $eventsSql = "SELECT event_date, COUNT(*) as event_count FROM calendarevents GROUP BY event_date";
+        $eventsResult = $conn->query($eventsSql);
+        if ($eventsResult->num_rows > 0) {
+            while($row = $eventsResult->fetch_assoc()) {
+                $eventDates[] = $row['event_date'];
+                $eventCounts[] = $row['event_count'];
+            }
+        }
 
-    // Fetch user registrations per month data
-    $userRegistrationsPerMonthQuery = "SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as user_count FROM users GROUP BY month";
-    $userRegistrationsPerMonthResult = mysqli_query($conn, $userRegistrationsPerMonthQuery);
-    $registrationMonths = [];
-    $registrationMonthCounts = [];
-    while ($row = mysqli_fetch_assoc($userRegistrationsPerMonthResult)) {
-        $registrationMonths[] = $row['month'];
-        $registrationMonthCounts[] = $row['user_count'];
-    }
+        // Fetch Suggested Events Data
+        $suggestedEvents = [];
+        $suggestedEventsSql = "SELECT * FROM suggested_events";
+        $suggestedEventsResult = $conn->query($suggestedEventsSql);
+        if ($suggestedEventsResult->num_rows > 0) {
+            while($row = $suggestedEventsResult->fetch_assoc()) {
+                // Example of handling optional keys in suggested_events table
+                $id = isset($row['ID']) ? $row['ID'] : 'N/A';
+                $eventName = isset($row['EventName']) ? $row['EventName'] : 'N/A';
+                $eventDate = isset($row['EventDate']) ? $row['EventDate'] : 'N/A';
+                
+                $suggestedEvents[] = [
+                    'ID' => $id,
+                    'EventName' => $eventName,
+                    'EventDate' => $eventDate
+                ];
+            }
+        }
 
-    // Fetch recent events data
-    $recentEventsQuery = "SELECT * FROM events ORDER BY event_date DESC LIMIT 10";
-    $recentEventsResult = mysqli_query($conn, $recentEventsQuery);
-    ?>
-
-    <div class="toggle-buttons">
-        <!-- <button onclick="showView('eventChartContainer')">Show Event Chart</button> -->
-        <button onclick="showView('eventTableContainer')">Show Event Table</button>
+        
+?>
+   <div class="toggle-buttons">
+        <button onclick="showView('eventChartContainer')">Show Event Chart</button>
         <button onclick="showView('userChartContainer')">Show User Chart</button>
-        <button onclick="showView('userTableContainer')">Show User Table</button>
-        <button onclick="showView('eventsPerMonthChartContainer')">Show Events Per Month Chart</button>
-        <button onclick="showView('eventsPerMonthTableContainer')">Show Events Per Month Table</button>
-        <button onclick="showView('registrationsPerMonthChartContainer')">Show Registrations Per Month Chart</button>
-        <button onclick="showView('registrationsPerMonthTableContainer')">Show Registrations Per Month Table</button>
+        <button onclick="showView('faqTableContainer')">Show FAQ Table</button>
+        <button onclick="showView('newUsersTableContainer')">Show New Users Table</button>
+        <button onclick="showView('newRegistersTableContainer')">Show New Registers Table</button>
+        <button onclick="showView('suggestionsTableContainer')">Show Suggestions Table</button>
+        <button onclick="showView('suggestedEventsTableContainer')">Show Suggested Events Table</button>
     </div>
 
-    
-
-    <!-- Event Table -->
-    <div id="eventTableContainer" class="table-container">
-        <h2>Events</h2>
-        <table id="eventTable">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Event Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                foreach ($eventDates as $index => $date) {
-                    echo "<tr>";
-                    echo "<td>$date</td>";
-                    echo "<td>{$eventCounts[$index]}</td>";
-                    echo "</tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+    <div id="eventChartContainer" class="chart-container">
+        <canvas id="eventChart"></canvas>
         <button onclick="downloadTableAsExcel('eventTable', 'EventTable')">Download Event Table as Excel</button>
     </div>
 
-    <!-- User Chart -->
     <div id="userChartContainer" class="chart-container">
         <canvas id="userChart"></canvas>
-        <button onclick="downloadChartAsExcel('userChart', 'UserChart')">Download User Chart as Excel</button>
-    </div>
-
-    <!-- User Table -->
-    <div id="userTableContainer" class="table-container">
-        <h2>Users</h2>
-        <table id="userTable">
-            <thead>
-                <tr>
-                    <th>User Type</th>
-                    <th>User Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                foreach ($userTypes as $index => $type) {
-                    echo "<tr>";
-                    echo "<td>$type</td>";
-                    echo "<td>{$userCounts[$index]}</td>";
-                    echo "</tr>";
-                }
-                ?>
-            </tbody>
-        </table>
         <button onclick="downloadTableAsExcel('userTable', 'UserTable')">Download User Table as Excel</button>
     </div>
 
-    <!-- Events Per Month Chart -->
-    <div id="eventsPerMonthChartContainer" class="chart-container">
-        <canvas id="eventsPerMonthChart"></canvas>
-        <button onclick="downloadChartAsExcel('eventsPerMonthChart', 'EventsPerMonthChart')">Download Events Per Month Chart as Excel</button>
-    </div>
-
-    <!-- Events Per Month Table -->
-    <div id="eventsPerMonthTableContainer" class="table-container">
-        <h2>Events Per Month</h2>
-        <table id="eventsPerMonthTable">
+    <!-- FAQ Table -->
+    <div id="faqTableContainer" class="table-container">
+        <h2>FAQs</h2>
+        <table id="faqTable">
             <thead>
                 <tr>
-                    <th>Month</th>
-                    <th>Event Count</th>
+                    <th>Question</th>
+                    <th>Answer</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                foreach ($eventMonths as $index => $month) {
-                    echo "<tr>";
-                    echo "<td>$month</td>";
-                    echo "<td>{$eventMonthCounts[$index]}</td>";
-                    echo "</tr>";
-                }
-                ?>
+                <?php foreach ($faqQuestions as $index => $question) : ?>
+                <tr>
+                    <td><?= $question ?></td>
+                    <td><?= $faqAnswers[$index] ?></td>
+                </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
-        <button onclick="downloadTableAsExcel('eventsPerMonthTable', 'EventsPerMonthTable')">Download Events Per Month Table as Excel</button>
+        <button onclick="downloadTableAsExcel('faqTable', 'FAQTable')">Download FAQ Table as Excel</button>
     </div>
 
-    <!-- Registrations Per Month Chart -->
-    <div id="registrationsPerMonthChartContainer" class="chart-container">
-        <canvas id="registrationsPerMonthChart"></canvas>
-        <button onclick="downloadChartAsExcel('registrationsPerMonthChart', 'RegistrationsPerMonthChart')">Download Registrations Per Month Chart as Excel</button>
-    </div>
-
-    <!-- Registrations Per Month Table -->
-    <div id="registrationsPerMonthTableContainer" class="table-container">
-        <h2>Registrations Per Month</h2>
-        <table id="registrationsPerMonthTable">
+    <!-- New Users Table -->
+    <div id="newUsersTableContainer" class="table-container">
+        <h2>New Users</h2>
+        <table id="newUsersTable">
             <thead>
                 <tr>
-                    <th>Month</th>
-                    <th>Registrations</th>
+                    <th>Name</th>
+                    <th>Email</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                foreach ($registrationMonths as $index => $month) {
-                    echo "<tr>";
-                    echo "<td>$month</td>";
-                    echo "<td>{$registrationMonthCounts[$index]}</td>";
-                    echo "</tr>";
-                }
-                ?>
+                <?php foreach ($newUserNames as $index => $name) : ?>
+                <tr>
+                    <td><?= $name ?></td>
+                    <td><?= $newUserEmails[$index] ?></td>
+                </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
-        <button onclick="downloadTableAsExcel('registrationsPerMonthTable', 'RegistrationsPerMonthTable')">Download Registrations Per Month Table as Excel</button>
+        <button onclick="downloadTableAsExcel('newUsersTable', 'NewUsersTable')">Download New Users Table as Excel</button>
+    </div>
+
+    <!-- New Registers Table -->
+    <div id="newRegistersTableContainer" class="table-container">
+        <h2>New Registers</h2>
+        <table id="newRegistersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date Registered</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($newRegisters as $register) : ?>
+                <tr>
+                    <td><?= $register['ID'] ?></td>
+                    <td><?= $register['Name'] ?></td>
+                    <td><?= $register['Email'] ?></td>
+                    <td><?= $register['DateRegistered'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <button onclick="downloadTableAsExcel('newRegistersTable', 'NewRegistersTable')">Download New Registers Table as Excel</button>
+    </div>
+
+    <!-- Suggestions Table -->
+    <div id="suggestionsTableContainer" class="table-container">
+        <h2>Suggestions</h2>
+        <table id="suggestionsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Suggestion</th>
+                    <th>User ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($suggestions as $suggestion) : ?>
+                <tr>
+                    <td><?= $suggestion['ID'] ?></td>
+                    <td><?= $suggestion['Suggestion'] ?></td>
+                    <td><?= $suggestion['UserID'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <button onclick="downloadTableAsExcel('suggestionsTable', 'SuggestionsTable')">Download Suggestions Table as Excel</button>
+    </div>
+
+    <!-- Suggested Events Table -->
+    <div id="suggestedEventsTableContainer" class="table-container">
+        <h2>Suggested Events</h2>
+        <table id="suggestedEventsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Event Name</th>
+                    <th>Event Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($suggestedEvents as $event) : ?>
+                <tr>
+                    <td><?= $event['ID'] ?></td>
+                    <td><?= $event['EventName'] ?></td>
+                    <td><?= $event['EventDate'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <button onclick="downloadTableAsExcel('suggestedEventsTable', 'SuggestedEventsTable')">Download Suggested Events Table as Excel</button>
     </div>
 
     <script>
-        const userCtx = document.getElementById('userChart').getContext('2d');
-    const userChart = new Chart(userCtx, {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode($userTypes); ?>,
-            datasets: [{
-                label: 'Number of Users',
-                data: <?php echo json_encode($userCounts); ?>,
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+        const views = document.querySelectorAll('.chart-container, .table-container');
+        views.forEach(view => view.style.display = 'none');
+
+        function showView(viewId) {
+            views.forEach(view => view.style.display = 'none');
+            document.getElementById(viewId).style.display = 'block';
+        }
+
+        function downloadTableAsExcel(tableId, filename) {
+            const table = document.getElementById(tableId);
+            const wb = XLSX.utils.table_to_book(table);
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+        }
+
+        // Event Chart
+        const eventDates = <?= json_encode($eventDates) ?>;
+        const eventCounts = <?= json_encode($eventCounts) ?>;
+
+        const ctxEventChart = document.getElementById('eventChart').getContext('2d');
+        new Chart(ctxEventChart, {
+            type: 'bar',
+            data: {
+                labels: eventDates,
+                datasets: [{
+                    label: 'Event Count',
+                    data: eventCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
 
-    const eventsPerMonthCtx = document.getElementById('eventsPerMonthChart').getContext('2d');
-    const eventsPerMonthChart = new Chart(eventsPerMonthCtx, {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode($eventMonths); ?>,
-            datasets: [{
-                label: 'Events Per Month',
-                data: <?php echo json_encode($eventMonthCounts); ?>,
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                borderColor: 'rgba(255, 159, 64, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+        // User Chart
+        const userNames = <?= json_encode($newUserNames) ?>;
+        const userEmails = <?= json_encode($newUserEmails) ?>;
+
+        const ctxUserChart = document.getElementById('userChart').getContext('2d');
+        new Chart(ctxUserChart, {
+            type: 'pie',
+            data: {
+                labels: userNames,
+                datasets: [{
+                    label: 'User Emails',
+                    data: userEmails.map(email => 1),
+                    backgroundColor: userNames.map((_, i) => `hsl(${i * 30}, 70%, 50%)`)
+                }]
             }
-        }
-    });
-
-    const registrationsPerMonthCtx = document.getElementById('registrationsPerMonthChart').getContext('2d');
-    const registrationsPerMonthChart = new Chart(registrationsPerMonthCtx, {
-        type: 'line',
-        data: {
-            labels: <?php echo json_encode($registrationMonths); ?>,
-            datasets: [{
-                label: 'User Registrations Per Month',
-                data: <?php echo json_encode($registrationMonthCounts); ?>,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Initially show the event chart
-    showView('eventChartContainer');
+        });
     </script>
 </body>
 </html>
